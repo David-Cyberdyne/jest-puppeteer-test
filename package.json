@@ -4,14 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --passWithNoTests"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "jest": "^27.0.1",
-    "jest-puppeteer": "^5.0.4",
     "puppeteer": "^9.1.1"
+  },
+  "jest": {
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "node_modules"
+    ]
   }
 }
