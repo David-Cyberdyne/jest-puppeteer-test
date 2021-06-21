@@ -14,22 +14,12 @@ beforeAll(async () => {
 
 describe('Test header and title of the page', () => {
 
-    
-    // test('Accept cookies', async () => {
-    //     await page.waitForSelector('#paqCookies > div.paqCookiesWrapper > div > div > div.col-md-12.paqCookiesBtsCont > a.paqCookiesAcceptAllBt');
-    //     await page.click('#paqCookies > div.paqCookiesWrapper > div > div > div.col-md-12.paqCookiesBtsCont > a.paqCookiesAcceptAllBt');
-    //     const html = await page.evaluate('document.getElementById("#paqCookies > div.paqCookiesWrapper > div > div > div.col-md-12.paqCookiesBtsCont > a.paqCookiesAcceptAllBt")');
-    //     // console.log(await page.cookies());
-    //     expect(html).toBe(null);
-    // });
-    
-
     test('Title of the page', async () => {
         const title = await page.title();
         expect(title).toBe('Ventanilla Electrónica de la Administración de la Junta de Andalucía - Inicio');
     });
 
-    test('Browse to the path', async () => {
+    test('Browse to the form', async () => {
         await page.waitForSelector('#contenido > div > div > div > div.cuerpoDiv.af_panelGroupLayout > div:nth-child(3) > div > div.elementoACentrar.af_panelGroupLayout > a');
         await page.click('#contenido > div > div > div > div.cuerpoDiv.af_panelGroupLayout > div:nth-child(3) > div > div.elementoACentrar.af_panelGroupLayout > a');
         await new Promise(resolve =>  setTimeout(resolve, 5000));
@@ -51,22 +41,58 @@ describe('Test header and title of the page', () => {
         await page.waitForSelector('#j_id180 > div > div:nth-child(2) > div > span > a');
         await page.click('#j_id180 > div > div:nth-child(2) > div > span > a');
         await new Promise(resolve =>  setTimeout(resolve, 20000));
-        let iframes = await page.frames();
-        console.log('----------------- Número de iframes', iframes.length);
-        iframes.forEach(element => {
-            console.log('NOMBRES', element._url);
-        });
-        const frame = await page.mainFrame();
-        console.log('++++++++++++++++++++++', frame._url);
+    });
+    test('Check the form exists', async () => {
         const childFrame = await page.mainFrame().childFrames()[0];
-        console.log('++++++++++++++++++++++', childFrame._url);
+        const chidFrameUrl = childFrame._url;
+        expect(chidFrameUrl).toContain("http://10.140.88.83/medioambiente/ctr_form-vea-ptw-externo/vea/inicio");
+
         const subChildFrame = await childFrame.childFrames()[0];
-        console.log('++++++++++++++++++++++', subChildFrame._url);
-        const inicio = await childFrame.$eval("a[class*='mat-list-item active primaryLevel'] > div > label", element => element.innerHTML);
-        console.log(inicio);
-        const inicio2 = await subChildFrame.$eval("body > app-root > app-datos-previos > form > div > div > div.row-cabecera-2 > div.row.col-12.jc-space.p-m-unset > div.col-5.br-2.f-left > div.form-check.pt-5 > label", element => element.innerHTML);
-        console.log(inicio2);
-        // expect(inicio).toBe("Datos previos");
+        const subChidFrameUrl = subChildFrame._url;
+        expect(subChidFrameUrl).toContain("http://10.140.88.83/medioambiente/sira-form-AITR/datosPrevios");
+    });
+    test('Check form main menu', async () => {
+        const childFrame = await page.mainFrame().childFrames()[0];
+        const mainMenuItems = ['Datos previos', 'Datos generales', 'Datos específicos', 'Documentación y declaración'];
+        const mainMenuLength = await childFrame.evaluate('document.querySelectorAll("a > div > label").length');
+        expect(mainMenuLength).toBe(4);
+        const mainMenuOption1 = await childFrame.evaluate('document.querySelectorAll("a > div > label")[0].innerText');
+        expect(mainMenuOption1).toBe(mainMenuItems[0]);
+        const mainMenuOption2 = await childFrame.evaluate('document.querySelectorAll("a > div > label")[1].innerText');
+        expect(mainMenuOption2).toBe(mainMenuItems[1]);
+        const mainMenuOption3 = await childFrame.evaluate('document.querySelectorAll("a > div > label")[2].innerText');
+        expect(mainMenuOption3).toBe(mainMenuItems[2]);
+        const mainMenuOption4 = await childFrame.evaluate('document.querySelectorAll("a > div > label")[3].innerText');
+        expect(mainMenuOption4).toBe(mainMenuItems[3]);
+    });
+
+    test('Check type of elements - Checkbox', async () => {
+        const childFrame = await page.mainFrame().childFrames()[0];
+        const subChildFrame = await childFrame.childFrames()[0];
+        await new Promise(resolve =>  setTimeout(resolve, 2000));
+        await subChildFrame.click('body > app-root > app-datos-previos > form > div > div > div.row-cabecera-2 > div.row.col-12.jc-space.p-m-unset > div.col-5.br-2.f-left > div.row.row-4-1 > div:nth-child(1) > p-checkbox > div > div.ui-chkbox-box.ui-widget.ui-corner-all.ui-state-default');
+        await new Promise(resolve =>  setTimeout(resolve, 2000));
+        await subChildFrame.click('body > app-root > app-datos-previos > form > div > div > div.row-cabecera-2 > div.row.col-12.jc-space.p-m-unset > div.col-5.br-2.f-left > div.row.row-4-1 > div:nth-child(1) > p-checkbox > div > div.ui-chkbox-box.ui-widget.ui-corner-all.ui-state-default.ui-state-active');
+        await new Promise(resolve =>  setTimeout(resolve, 2000));
+        await subChildFrame.click('body > app-root > app-datos-previos > form > div > div > div.row-cabecera-2 > div.row.col-12.jc-space.p-m-unset > div.col-5.br-2.f-left > div.row.row-4-1 > div:nth-child(1) > p-checkbox > div > div.ui-chkbox-box.ui-widget.ui-corner-all.ui-state-default');
+        await new Promise(resolve =>  setTimeout(resolve, 2000));
+        await subChildFrame.click('body > app-root > app-datos-previos > form > div > div > div.row-cabecera-2 > div.row.col-12.jc-space.p-m-unset > div.col-5.br-2.f-left > div.row.row-4-1 > div:nth-child(1) > p-checkbox > div > div.ui-chkbox-box.ui-widget.ui-corner-all.ui-state-default.ui-state-active');
+        
+    });
+
+    test('Check type of elements - YES/NO', async () => {
+        const childFrame = await page.mainFrame().childFrames()[0];
+        const subChildFrame = await childFrame.childFrames()[0];
+        await new Promise(resolve =>  setTimeout(resolve, 2000));
+        await subChildFrame.click('#mat-button-toggle-2-button');
+        const elementType = await subChildFrame.$eval('#mat-button-toggle-2-button', element => element.nodeName);
+        expect(elementType).toBe("BUTTON");
+        await new Promise(resolve =>  setTimeout(resolve, 2000));
+        await subChildFrame.click('#mat-button-toggle-3-button');
+        await new Promise(resolve =>  setTimeout(resolve, 2000));
+        await subChildFrame.click('#mat-button-toggle-2-button');
+        await new Promise(resolve =>  setTimeout(resolve, 2000));
+        await subChildFrame.click('#mat-button-toggle-3-button');
     });
 
     
